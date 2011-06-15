@@ -21,99 +21,66 @@
 ****************************************************************************/
 
 
-#include <camp/function.hpp>
-#include <camp/classvisitor.hpp>
-#include <camp/errors.hpp>
+#include <camp/typeinfo.hpp>
 
 
 namespace camp
 {
 //-------------------------------------------------------------------------------------------------
-Function::~Function()
+ArrayType::ArrayType(TypeInfo elementTypeInfo)
+    : m_elementType(elementTypeInfo)
 {
+
 }
 
 //-------------------------------------------------------------------------------------------------
-const std::string& Function::name() const
+camp::TypeInfo ArrayType::elements() const
 {
-    return m_name;
+    return m_elementType;
 }
 
 //-------------------------------------------------------------------------------------------------
-std::size_t Function::argCount() const
+bool ArrayType::operator==(const ArrayType& other) const
 {
-    return m_argTypes.size();
+    return m_elementType == other.m_elementType;
 }
 
 //-------------------------------------------------------------------------------------------------
-Type Function::returnType() const
+bool ArrayType::operator!=(const ArrayType& other) const
 {
-    return m_returnType;
+    return !ArrayType::operator==(other);
 }
 
 //-------------------------------------------------------------------------------------------------
-TypeInfo Function::returnTypeInfo() const
+DictionaryType::DictionaryType(TypeInfo keyTypeInfo, TypeInfo elementTypeInfo)
+    : m_keyType(keyTypeInfo)
+    , m_elementType(elementTypeInfo)
 {
-    return m_returnTypeInfo;
+
 }
 
 //-------------------------------------------------------------------------------------------------
-Type Function::argType(std::size_t index) const
+TypeInfo DictionaryType::keys() const
 {
-    // Make sure that the index is not out of range
-    if (index >= m_argTypes.size())
-        CAMP_ERROR(OutOfRange(index, m_argTypes.size()));
-
-    return m_argTypes[index];
+    return m_keyType;
 }
 
 //-------------------------------------------------------------------------------------------------
-TypeInfo Function::argTypeInfo(std::size_t index) const
+TypeInfo DictionaryType::elements() const
 {
-    // Make sure that the index is not out of range
-    if (index >= m_argTypeInfo.size())
-        CAMP_ERROR(OutOfRange(index, m_argTypeInfo.size()));
-
-    return m_argTypeInfo[index];
+    return m_elementType;
 }
 
 //-------------------------------------------------------------------------------------------------
-bool Function::callable(const UserObject& object) const
+bool DictionaryType::operator==(const DictionaryType& other) const
 {
-    return m_callable.get(object);
+    return m_keyType == other.m_keyType && m_elementType == other.m_elementType;
 }
 
 //-------------------------------------------------------------------------------------------------
-Value Function::call(const UserObject& object, const Args& args) const
+bool DictionaryType::operator!=(const DictionaryType& other) const
 {
-    // Check if the function is callable
-    if (!callable(object))
-        CAMP_ERROR(ForbiddenCall(name()));
-
-    // Check the number of arguments
-    if (args.count() < m_argTypes.size())
-        CAMP_ERROR(NotEnoughArguments(name(), args.count(), m_argTypes.size()));
-
-    // Execute the function
-    return execute(object, args);
-}
-
-//-------------------------------------------------------------------------------------------------
-void Function::accept(ClassVisitor& visitor) const
-{
-    visitor.visit(*this);
-}
-
-//-------------------------------------------------------------------------------------------------
-Function::Function(const std::string& name, Type returnType, TypeInfo returnTypeInfo, const std::vector<Type>& argTypes,
-    const std::vector<TypeInfo>& argTypeInfo)
-    : m_name(name)
-    , m_returnType(returnType)
-    , m_returnTypeInfo(returnTypeInfo)
-    , m_argTypes(argTypes)
-    , m_argTypeInfo(argTypeInfo)
-    , m_callable(true)
-{
+    return !DictionaryType::operator==(other);
 }
 
 } // namespace camp

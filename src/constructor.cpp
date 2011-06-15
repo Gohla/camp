@@ -21,44 +21,26 @@
 ****************************************************************************/
 
 
-#include <camp/function.hpp>
-#include <camp/classvisitor.hpp>
+#include <camp/constructor.hpp>
 #include <camp/errors.hpp>
 
 
 namespace camp
 {
 //-------------------------------------------------------------------------------------------------
-Function::~Function()
+Constructor::~Constructor()
 {
+
 }
 
 //-------------------------------------------------------------------------------------------------
-const std::string& Function::name() const
-{
-    return m_name;
-}
-
-//-------------------------------------------------------------------------------------------------
-std::size_t Function::argCount() const
+std::size_t Constructor::argCount() const
 {
     return m_argTypes.size();
 }
 
 //-------------------------------------------------------------------------------------------------
-Type Function::returnType() const
-{
-    return m_returnType;
-}
-
-//-------------------------------------------------------------------------------------------------
-TypeInfo Function::returnTypeInfo() const
-{
-    return m_returnTypeInfo;
-}
-
-//-------------------------------------------------------------------------------------------------
-Type Function::argType(std::size_t index) const
+Type Constructor::argType(std::size_t index) const
 {
     // Make sure that the index is not out of range
     if (index >= m_argTypes.size())
@@ -68,7 +50,7 @@ Type Function::argType(std::size_t index) const
 }
 
 //-------------------------------------------------------------------------------------------------
-TypeInfo Function::argTypeInfo(std::size_t index) const
+camp::TypeInfo Constructor::argTypeInfo(std::size_t index) const
 {
     // Make sure that the index is not out of range
     if (index >= m_argTypeInfo.size())
@@ -78,42 +60,11 @@ TypeInfo Function::argTypeInfo(std::size_t index) const
 }
 
 //-------------------------------------------------------------------------------------------------
-bool Function::callable(const UserObject& object) const
-{
-    return m_callable.get(object);
-}
-
-//-------------------------------------------------------------------------------------------------
-Value Function::call(const UserObject& object, const Args& args) const
-{
-    // Check if the function is callable
-    if (!callable(object))
-        CAMP_ERROR(ForbiddenCall(name()));
-
-    // Check the number of arguments
-    if (args.count() < m_argTypes.size())
-        CAMP_ERROR(NotEnoughArguments(name(), args.count(), m_argTypes.size()));
-
-    // Execute the function
-    return execute(object, args);
-}
-
-//-------------------------------------------------------------------------------------------------
-void Function::accept(ClassVisitor& visitor) const
-{
-    visitor.visit(*this);
-}
-
-//-------------------------------------------------------------------------------------------------
-Function::Function(const std::string& name, Type returnType, TypeInfo returnTypeInfo, const std::vector<Type>& argTypes,
-    const std::vector<TypeInfo>& argTypeInfo)
-    : m_name(name)
-    , m_returnType(returnType)
-    , m_returnTypeInfo(returnTypeInfo)
-    , m_argTypes(argTypes)
+Constructor::Constructor(const std::vector<Type>& argTypes, const std::vector<TypeInfo>& argTypeInfo)
+    : m_argTypes(argTypes)
     , m_argTypeInfo(argTypeInfo)
-    , m_callable(true)
 {
+
 }
 
 } // namespace camp
