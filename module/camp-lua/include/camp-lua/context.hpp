@@ -24,6 +24,7 @@
 #ifndef CAMP_LUA_CONTEXT_HPP
 #define CAMP_LUA_CONTEXT_HPP
 
+#include <camp-lua/config.hpp>
 #include <camp-lua/object.hpp>
 #include <camp/config.hpp>
 #include <boost/noncopyable.hpp>
@@ -58,7 +59,7 @@ namespace lua
  * A top-level camp::lua::Context (i.e. with no parent context) being self contained, it allows to
  * run different ones in different system threads.
  */
-class CAMP_API Context : boost::noncopyable
+class CAMP_LUA_API Context : boost::noncopyable
 {
 public:
     /**

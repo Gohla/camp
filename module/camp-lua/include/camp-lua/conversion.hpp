@@ -23,6 +23,7 @@
 #ifndef CAMP_LUA_CONVERSION_HPP
 #define CAMP_LUA_CONVERSION_HPP
 
+#include <camp-lua/config.hpp>
 #include <camp/value.hpp>
 #include <string>
 
@@ -41,7 +42,7 @@ namespace lua
  * \param L The Lua stack receiving the metatable
  * \param metaclass Metaclass to be pushed on the stack
  */
-void CAMP_API classToLua(lua_State* L, const camp::Class& metaclass);
+void CAMP_LUA_API classToLua(lua_State* L, const camp::Class& metaclass);
 
 /**
  * \brief Push onto the Lua stack \a L the table containing the values from given \a metaenum
@@ -49,7 +50,7 @@ void CAMP_API classToLua(lua_State* L, const camp::Class& metaclass);
  * \param L The Lua stack receiving the table.
  * \param metaenum Metaenum to be pushed on the stack.
  */
-void CAMP_API enumToLua(lua_State* L, const camp::Enum& metaenum);
+void CAMP_LUA_API enumToLua(lua_State* L, const camp::Enum& metaenum);
 
 /**
  * \brief Return the value at \a index in the Lua stack \a L as a camp::Value
@@ -60,7 +61,7 @@ void CAMP_API enumToLua(lua_State* L, const camp::Enum& metaenum);
  * \param index Lua index (or pseudo-index) of the desired value in the stack
  * \return The value as camp::Value
  */
-camp::Value CAMP_API valueFromLua(lua_State* L, int index);
+camp::Value CAMP_LUA_API valueFromLua(lua_State* L, int index);
 
 /**
  * \brief Push onto the Lua stack \a L the given \a value
@@ -69,7 +70,7 @@ camp::Value CAMP_API valueFromLua(lua_State* L, int index);
  * \param value Value to be pushed on the stack
  * \param constructed If the value was constructed in camp, set to true. Defaults to false
  */
-void CAMP_API valueToLua(lua_State* L, camp::Value value, bool constructed = false);
+void CAMP_LUA_API valueToLua(lua_State* L, camp::Value value, bool constructed = false);
 } // namespace lua
 } // namespace camp
 

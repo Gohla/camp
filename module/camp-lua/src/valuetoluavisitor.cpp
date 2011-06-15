@@ -23,8 +23,8 @@
 
 #include <camp-lua/valuetoluavisitor.hpp>
 #include <camp-lua/callback.hpp>
+#include <camp-lua/lua.hpp>
 #include <camp/class.hpp>
-#include <lua.hpp>
 
 namespace camp
 {

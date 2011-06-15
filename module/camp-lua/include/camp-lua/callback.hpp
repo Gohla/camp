@@ -25,6 +25,7 @@
 #ifndef CAMP_LUA_CALLBACK_HPP
 #define CAMP_LUA_CALLBACK_HPP
 
+#include <camp-lua/config.hpp>
 #include <string>
 
 struct lua_State;

@@ -23,11 +23,11 @@
 
 #include <camp-lua/callback.hpp>
 #include <camp-lua/conversion.hpp>
+#include <camp-lua/lua.hpp>
 #include <camp/class.hpp>
 #include <camp/property.hpp>
 #include <camp/function.hpp>
 #include <camp/error.hpp>
-#include <lua.hpp>
 
 namespace camp
 {

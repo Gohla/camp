@@ -23,6 +23,7 @@
 #ifndef CAMP_LUA_VALUETOLUAVISITOR_HPP
 #define CAMP_LUA_VALUETOLUAVISITOR_HPP
 
+#include <camp-lua/config.hpp>
 #include <camp/valuevisitor.hpp>
 #include <camp/type.hpp>
 #include <camp/enumobject.hpp>
@@ -38,7 +39,7 @@ namespace lua
  * \brief ValueToLuaVisitor visit a camp::Value and push on a Lua stack a Lua value according to the
  * camp::Value type.
  */
-class CAMP_API ValueToLuaVisitor : public ValueVisitor<void>
+class CAMP_LUA_API ValueToLuaVisitor : public ValueVisitor<void>
 {
 public:
     /**

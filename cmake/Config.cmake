@@ -41,6 +41,20 @@ if(NOT BUILD_TEST_QT)
     )
 endif()
 
+# Lua scripting module
+if(NOT BUILD_LUA)
+    set(BUILD_LUA FALSE
+        CACHE BOOL "TRUE to enable building of the lua module, FALSE to disable."
+    )
+endif()
+
+# Lua scripting module tets
+if(NOT BUILD_TEST_LUA)
+    set(BUILD_TEST_LUA FALSE
+        CACHE BOOL "TRUE to enable building of the lua module tests, FALSE to disable."
+    )
+endif()
+
 # define install directory for miscelleneous files
 if(WIN32 AND NOT UNIX)
     set(INSTALL_MISC_DIR .)

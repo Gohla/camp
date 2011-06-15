@@ -32,3 +32,5 @@ moc_*
 # Auto-generated documentation files
 doc/api/*/*
 
+
+/VCBuild

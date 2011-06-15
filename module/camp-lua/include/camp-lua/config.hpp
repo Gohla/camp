@@ -20,52 +20,43 @@
 **
 ****************************************************************************/
 
-#include <camp-lua/object.hpp>
-#include <camp-lua/conversion.hpp>
-#include <camp-lua/lua.hpp>
 
-namespace camp
-{
-namespace lua
-{
+#ifndef CAMP_LUA_CONFIG_HPP
+#define CAMP_LUA_CONFIG_HPP
 
-Object::Object(lua_State* L, const std::string& name)
-    : m_L(L)
-    , m_name(name)
-{
 
-}
+// We define the CAMP_LUA_API macro according to the
+// current operating system and build mode
+#if defined(_WIN32) || defined(__WIN32__)
 
-Object::operator camp::Value()
-{
-    lua_getglobal(m_L, m_name.c_str());
-    camp::Value v = valueFromLua(m_L, -1);
-    lua_pop(m_L, 1);
-    return v;
-}
+    #ifndef CAMP_STATIC
 
-Object& Object::operator=(camp::Value value)
-{
-    valueToLua(m_L, value);
-    lua_setglobal(m_L, m_name.c_str());
-    return *this;
-}
+        // Windows platforms need specific keywords for import / export
+        #ifdef CAMP_LUA_EXPORTS
 
-Object& Object::operator=(const camp::Class& metaclass)
-{
-    classToLua(m_L, metaclass);
-    lua_setglobal(m_L, m_name.c_str());
-    return *this;
-}
+            // From DLL side, we must export
+            #define CAMP_LUA_API __declspec(dllexport)
 
-Object& Object::operator=(const camp::Enum& metaenum)
-{
-    enumToLua(m_L, metaenum);
-    lua_setglobal(m_L, m_name.c_str());
-    return *this;
-}
+        #else
 
-} // namespace lua
+            // From client application side, we must import
+            #define CAMP_LUA_API __declspec(dllimport)
 
-} // namespace camp
+        #endif
 
+    #else
+
+        // No specific directive needed for static build
+        #define CAMP_LUA_API
+
+    #endif
+
+#else
+
+    // Other platforms don't need to define anything
+    #define CAMP_LUA_API
+
+#endif
+
+
+#endif // CAMP_LUA_CONFIG_HPP

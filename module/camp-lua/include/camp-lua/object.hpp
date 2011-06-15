@@ -24,7 +24,7 @@
 #ifndef CAMP_LUA_OBJECT_HPP
 #define CAMP_LUA_OBJECT_HPP
 
-#include <camp/config.hpp>
+#include <camp-lua/config.hpp>
 #include <camp/value.hpp>
 #include <string>
 
@@ -43,7 +43,7 @@ namespace lua
  * conversion operator.
  * Write access is provided through the affectation operator with a camp::Value parameter.
  */
-class CAMP_API Object 
+class CAMP_LUA_API Object 
 {
 public:
     /**

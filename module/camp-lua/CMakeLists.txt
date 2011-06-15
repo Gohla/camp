@@ -38,6 +38,8 @@ set(CAMP_LUA_SRCS
     src/context.cpp
     include/camp-lua/callback.hpp
     src/callback.cpp
+	include/camp-lua/lua.hpp
+	include/camp-lua/config.hpp
 )
 
 # find Lua
@@ -54,7 +56,7 @@ add_library(camp-lua ${CAMP_LUA_SRCS})
 
 # define the export macro
 if(BUILD_SHARED_LIBS)
-    set_target_properties(camp-lua PROPERTIES DEFINE_SYMBOL CAMP_EXPORTS)
+    set_target_properties(camp-lua PROPERTIES DEFINE_SYMBOL CAMP_LUA_EXPORTS)
 else()
     add_definitions(-DCAMP_STATIC)
 endif()
@@ -79,3 +81,17 @@ if(BUILD_TEST_LUA)
     add_subdirectory(test)
 endif()
 
+###############################
+# installing
+###############################
+
+install(DIRECTORY include
+    DESTINATION .
+    COMPONENT devel
+)
+
+install(TARGETS camp-lua
+    RUNTIME DESTINATION bin COMPONENT bin
+    LIBRARY DESTINATION lib COMPONENT bin 
+    ARCHIVE DESTINATION lib COMPONENT devel
+)

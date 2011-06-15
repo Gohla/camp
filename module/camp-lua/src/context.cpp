@@ -21,7 +21,7 @@
 ****************************************************************************/
 
 #include <camp-lua/context.hpp>
-#include <lua.hpp>
+#include <camp-lua/lua.hpp>
 
 namespace camp
 {
