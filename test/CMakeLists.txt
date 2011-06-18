@@ -55,6 +55,8 @@ set(CAMP_TEST_SRCS
     constructor.hpp
     mapper.cpp
     mapper.hpp
+	operator.hpp
+	operator.cpp
     inheritance.cpp
     inheritance.hpp
     userobject.cpp

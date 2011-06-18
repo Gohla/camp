@@ -34,6 +34,7 @@
 #include <camp/tagholder.hpp>
 #include <camp/errors.hpp>
 #include <camp/userobject.hpp>
+#include <camp/operator.hpp>
 #include <camp/detail/classmanager.hpp>
 #include <camp/detail/typeid.hpp>
 #include <boost/noncopyable.hpp>
@@ -42,6 +43,8 @@
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/random_access_index.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/composite_key.hpp>
 #include <string>
 
 
@@ -284,6 +287,66 @@ public:
     void destroy(const UserObject& object) const;
 
     /**
+     * \brief Return the total number of operators of this metaclass
+     *
+     * \return Number of operators
+     */
+    std::size_t operatorCount() const;
+
+    /**
+     * \brief Check if this metaclass contains at least one operator of given operator
+     *
+     * \param operatorType Type of the operator
+     *
+     * \return True if the operator is in the metaclass, false otherwise
+     */
+    bool hasOperator(OperatorType operatorType) const;
+
+    /**
+     * \brief Check if this metaclass contains the given operator
+     *
+     * \param operatorType Type of the operator
+     * \param argType Type info of the operator argument type
+     *
+     * \return True if the operator is in the metaclass, false otherwise
+     */
+    bool hasOperator(OperatorType operatorType, TypeInfo argType) const;
+
+    /**
+     * \brief Get an operator from its index in this metaclass
+     *
+     * \param index Index of the operator to get
+     *
+     * \return Reference to the operator
+     *
+     * \throw OutOfRange index is out of range
+     */
+    const Function& getOperator(std::size_t index) const;
+
+    /**
+     * \brief Get an operator from its operator and argument type
+     *
+     * \param operatorType Type of the operator
+     * \param argType Type info of the operator argument type
+     *
+     * \return Reference to the operator
+     *
+     * \throw FunctionNotFound operator not found in this metaclass
+     */
+    const Function& getOperator(OperatorType operatorType, TypeInfo argType) const;
+
+    /**
+     * \brief Get an unary operator from its operator type
+     *
+     * \param operatorType Type of the operator
+     *
+     * \return Reference to the operator
+     *
+     * \throw FunctionNotFound operator not found in this metaclass
+     */
+    const Function& getUnaryOperator(OperatorType operatorType) const;
+
+    /**
      * \brief Start visitation of a class
      *
      * \param visitor Visitor to use for visitation
@@ -364,21 +427,41 @@ private:
 
     struct Id;
     struct Name;
+    struct OperatorLookup;
+    struct OperatorUnique;
 
     typedef boost::multi_index_container<PropertyPtr,
-        bm::indexed_by<bm::random_access<bm::tag<Id> >,
-                       bm::ordered_unique<bm::tag<Name>, bm::const_mem_fun<Property, const std::string&, &Property::name> >
+        bm::indexed_by< 
+            bm::random_access<bm::tag<Id> >,
+            bm::ordered_unique<bm::tag<Name>, bm::const_mem_fun<Property, const std::string&, &Property::name> >
         >
     > PropertyTable;
 
     typedef boost::multi_index_container<FunctionPtr,
-        bm::indexed_by<bm::random_access<bm::tag<Id> >,
-                       bm::ordered_unique<bm::tag<Name>, bm::const_mem_fun<Function, const std::string&, &Function::name> >
+        bm::indexed_by<
+            bm::random_access<bm::tag<Id> >,
+            bm::ordered_unique<bm::tag<Name>, bm::const_mem_fun<Function, const std::string&, &Function::name> >
         >
     > FunctionTable;
+    
+    typedef boost::multi_index_container<FunctionPtr,
+        bm::indexed_by<
+            bm::random_access<bm::tag<Id> >,
+            bm::hashed_non_unique<bm::tag<OperatorLookup>, 
+                bm::const_mem_fun<Function, OperatorType, &Function::operatorType>
+            >,
+            bm::ordered_unique<bm::tag<OperatorUnique>, bm::composite_key<
+                Function,
+                bm::const_mem_fun<Function, OperatorType, &Function::operatorType>,
+                bm::const_mem_fun<Function, TypeInfo, &Function::argTypeInfoSafe<0> >
+            > >
+        >
+    > OperatorTable;
 
     typedef PropertyTable::index<Name>::type PropertyNameIndex;
     typedef FunctionTable::index<Name>::type FunctionNameIndex;
+    typedef OperatorTable::index<OperatorUnique>::type UniqueOperatorIndex;
+    typedef OperatorTable::index<OperatorLookup>::type LookupOperatorIndex;
     typedef void (*Destructor)(const UserObject&);
 
     std::string m_name; ///< Name of the metaclass
@@ -388,6 +471,7 @@ private:
     PropertyTable m_own_properties; ///< Table of metaproperties (not from bases) indexed by name
     BaseList m_bases; ///< List of base metaclasses
     ConstructorList m_constructors; ///< List of metaconstructors
+    OperatorTable m_operators; ///< Table of operators
     Destructor m_destructor; ///< Destructor (function that is able to delete an abstract object)
 };
 

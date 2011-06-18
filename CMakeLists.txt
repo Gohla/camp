@@ -81,6 +81,8 @@ set(CAMP_SRCS
     src/enummanager.cpp
     include/camp/detail/observernotifier.hpp
     src/observernotifier.cpp
+	include/camp/operator.hpp
+	src/operator.cpp
     include/camp/camptype.hpp
     src/camptype.cpp
     include/camp/classcast.hpp
@@ -129,6 +131,7 @@ set(CAMP_SRCS
     include/camp/detail/objectholder.hpp
     include/camp/detail/objectholder.inl
     include/camp/detail/valueprovider.hpp
+	include/camp/detail/operatortraits.hpp
     include/camp/qt/qthelper.hpp
     include/camp/qt/qtsimpleproperty.hpp
     include/camp/qt/qtmapper.hpp

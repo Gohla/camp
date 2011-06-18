@@ -29,6 +29,7 @@
 #include <camp/classget.hpp>
 #include <camp/detail/functionimpl.hpp>
 #include <camp/detail/functiontraits.hpp>
+#include <camp/detail/operatortraits.hpp>
 #include <camp/detail/constructorimpl.hpp>
 #include <camp/detail/propertyfactory.hpp>
 #include <boost/noncopyable.hpp>
@@ -255,6 +256,33 @@ public:
     ClassBuilder<T>& function(const std::string& name, F1 function1, F2 function2);
 
     /**
+     * \brief Declare a new operator from any bindable type
+     *
+     * \param operatorType Type of the operator
+     * \param function C++ callable entity to bind to the function
+     *
+     * \return Reference to this, in order to chain other calls
+     */
+    template <typename F>
+    ClassBuilder<T>& addOperator(OperatorType operatorType, F function);
+
+    /**
+     * \brief Declare a new operator from any bindable type
+     *
+     * \return Reference to this, in order to chain other calls
+     */
+    template <OperatorType Op, typename R, typename A>
+    ClassBuilder<T>& addOperator();
+
+    /**
+     * \brief Declare a new operator from any bindable type
+     *
+     * \return Reference to this, in order to chain other calls
+     */
+    template <OperatorType Op, typename ROrA>
+    ClassBuilder<T>& addOperator();
+
+    /**
      * \brief Declare a new static tag
      *
      * \param id Identifier of the new tag (must be unique within the metaclass)
@@ -472,6 +500,15 @@ private:
      * \return Reference to this, in order to chain other calls
      */
     ClassBuilder<T>& addFunction(Function* function);
+
+    /**
+     * \brief Add a new operator to the target class
+     *
+     * \param function Function to add as operator
+     *
+     * \return Reference to this, in order to chain other calls
+     */
+    ClassBuilder<T>& addOperator(Function* function);
 
     Class* m_target; ///< Target metaclass to fill
     TagHolder* m_currentTagHolder; ///< Last tag holder which has been declared

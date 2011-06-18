@@ -28,8 +28,9 @@
 namespace camp
 {
 //-------------------------------------------------------------------------------------------------
-BadType::BadType(Type provided, Type expected)
-    : Error("value of type " + typeName(provided) + " couldn't be converted to type " + typeName(expected))
+BadType::BadType(TypeInfo provided, TypeInfo expected)
+    : Error("value of type " + provided.apply_visitor(TypeToString()) + " couldn't be converted to type " + 
+            expected.apply_visitor(TypeToString()))
 {
 }
 
@@ -40,28 +41,10 @@ BadType::BadType(const std::string& message)
 }
 
 //-------------------------------------------------------------------------------------------------
-std::string BadType::typeName(Type type)
-{
-    switch (type)
-    {
-        case noType:            return "none";
-        case boolType:          return "boolean";
-        case intType:           return "integer";
-        case realType:          return "real";
-        case stringType:        return "string";
-        case enumType:          return "enum";
-        case arrayType:         return "array";
-        case dictionaryType:    return "dictionary";
-        case valueType:         return "value";
-        case userType:          return "user";
-        default:                return "unknown";
-    }
-}
-
-//-------------------------------------------------------------------------------------------------
-BadArgument::BadArgument(Type provided, Type expected, std::size_t index, const std::string& functionName)
+BadArgument::BadArgument(TypeInfo provided, TypeInfo expected, std::size_t index, const std::string& functionName)
     : BadType("the argument #" + str(index) + " of function " + functionName +
-              " couldn't be converted from type " + typeName(provided) + " to type " + typeName(expected))
+              " couldn't be converted from type " + provided.apply_visitor(TypeToString()) + 
+              " to type " + expected.apply_visitor(TypeToString()))
 {
 }
 
@@ -128,6 +111,19 @@ ForbiddenWrite::ForbiddenWrite(const std::string& propertyName)
 //-------------------------------------------------------------------------------------------------
 FunctionNotFound::FunctionNotFound(const std::string& name, const std::string& className)
     : Error("the function " + name + " couldn't be found in metaclass " + className)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+OperatorNotFound::OperatorNotFound(OperatorType operatorType, TypeInfo argType, const std::string& className)
+    : Error("the operator " + operatorTypeName(operatorType) + " with argument type " + 
+            argType.apply_visitor(TypeToString()) + " couldn't be found in metaclass " + className)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+OperatorNotFound::OperatorNotFound(OperatorType operatorType, const std::string& className)
+    : Error("the unary operator " + operatorTypeName(operatorType) + " couldn't be found in metaclass " + className)
 {
 }
 

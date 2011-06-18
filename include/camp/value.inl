@@ -46,6 +46,25 @@ template <typename T>
 Value::Value(const T& val)
     : m_value(camp_ext::ValueMapper<T>::to(val))
     , m_type(mapType<T>())
+    , m_typeInfo(camp_ext::ValueMapper<T>::typeInfo())
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+template <>
+Value::Value(const UserObject& val)
+    : m_value(val)
+    , m_type(userType)
+    , m_typeInfo(&val.getClass())
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+template <>
+Value::Value(const EnumObject& val)
+    : m_value(val)
+    , m_type(enumType)
+    , m_typeInfo(&val.getEnum())
 {
 }
 
@@ -59,7 +78,7 @@ T Value::to() const
     }
     catch (boost::bad_lexical_cast&)
     {
-        CAMP_ERROR(BadType(type(), mapType<T>()));
+        CAMP_ERROR(BadType(type(), m_typeInfo));
     }
 }
 

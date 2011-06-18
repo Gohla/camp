@@ -91,8 +91,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo())
+    FunctionImpl(const std::string& name, boost::function<R (C)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo())
         , m_function(function)
     {
     }
@@ -123,8 +123,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C, A0)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), list_of(mapType<A0>()),
+    FunctionImpl(const std::string& name, boost::function<R (C, A0)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), list_of(mapType<A0>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo()))
         , m_function(function)
     {
@@ -157,8 +157,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo()))
         , m_function(function)
@@ -193,8 +193,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo()))
         , m_function(function)
@@ -230,8 +230,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2, A3)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2, A3)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>())(mapType<A3>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo())(camp_ext::ValueMapper<A3>::typeInfo()))
         , m_function(function)
@@ -268,8 +268,8 @@ public:
     /**
      * \brief Constructor
      */
-    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2, A3, A4)> function)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, boost::function<R (C, A0, A1, A2, A3, A4)> function, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>())(mapType<A3>())(mapType<A4>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo())(camp_ext::ValueMapper<A3>::typeInfo())(camp_ext::ValueMapper<A4>::typeInfo()))
         , m_function(function)
@@ -309,8 +309,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo())
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo())
         , m_function(boost::bind(function, boost::bind(accessor, _1)))
     {
     }
@@ -342,8 +342,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), list_of(mapType<A0>()),
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), list_of(mapType<A0>()),
         list_of(camp_ext::ValueMapper<A0>::typeInfo()))
         , m_function(boost::bind(function, boost::bind(accessor, _1), _2))
     {
@@ -378,8 +378,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo()))
         , m_function(boost::bind(function, boost::bind(accessor, _1), _2, _3))
@@ -416,8 +416,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo()))
         , m_function(boost::bind(function, boost::bind(accessor, _1), _2, _3, _4))
@@ -455,8 +455,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>())(mapType<A3>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo())(camp_ext::ValueMapper<A3>::typeInfo()))
         , m_function(boost::bind(function, boost::bind(accessor, _1), _2, _3, _4, _5))
@@ -495,8 +495,8 @@ public:
      * \brief Constructor
      */
     template <typename F1, typename F2>
-    FunctionImpl(const std::string& name, F1 function, F2 accessor)
-        : Function(name, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
+    FunctionImpl(const std::string& name, F1 function, F2 accessor, OperatorType operatorType = noop)
+        : Function(name, operatorType, mapType<R>(), camp_ext::ValueMapper<R>::typeInfo(), 
             list_of(mapType<A0>())(mapType<A1>())(mapType<A2>())(mapType<A3>())(mapType<A4>()),
             list_of(camp_ext::ValueMapper<A0>::typeInfo())(camp_ext::ValueMapper<A1>::typeInfo())(camp_ext::ValueMapper<A2>::typeInfo())(camp_ext::ValueMapper<A3>::typeInfo())(camp_ext::ValueMapper<A4>::typeInfo()))
         , m_function(boost::bind(function, boost::bind(accessor, _1), _2, _3, _4, _5, _6))

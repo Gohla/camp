@@ -26,6 +26,8 @@
 #define CAMP_LUA_CALLBACK_HPP
 
 #include <camp-lua/config.hpp>
+#include <camp-lua/conversion.hpp>
+#include <camp/operator.hpp>
 #include <string>
 
 struct lua_State;
@@ -81,19 +83,59 @@ int destructCallback(lua_State* L);
  * \brief Callback called when an operator is called in Lua.
  *
  * \param L Lua stack holding the userdata
- * \param rType The type of operator
  * \return Number of return value pushed on the stack
  */
-int operatorCallback(lua_State* L, const std::string& rType);
-inline int addCallback(lua_State* L) {return operatorCallback(L, "Add");}
-inline int subtractCallback(lua_State* L) {return operatorCallback(L, "Subtract");}
-inline int multiplyCallback(lua_State* L) {return operatorCallback(L, "Multiply");}
-inline int divideCallback(lua_State* L) {return operatorCallback(L, "Divide");}
-inline int modulusCallback(lua_State* L) {return operatorCallback(L, "Modulus");}
-inline int equalsCallback(lua_State* L) {return operatorCallback(L, "Equals");}
-inline int lessCallback(lua_State* L) {return operatorCallback(L, "Less");}
-inline int lessEqualsCallback(lua_State* L) {return operatorCallback(L, "LessEquals");}
-int unaryMinusCallback(lua_State* L);
+template<OperatorType Op>
+int operatorCallback(lua_State* L)
+{
+    // Check args
+    int argc = lua_gettop(L);
+    if (argc != 2)
+        return luaL_error(L, "Invalid args count (got %d, expected at least the object instance and one other argument)", argc);
+    if (!lua_isuserdata(L, 1))
+        return luaL_error(L, "First arg must be a userdata (got %s)", lua_typename(L, lua_type(L, 1)));
+
+    // Get args
+    camp::UserObject* userdata = static_cast<camp::UserObject*>(lua_touserdata(L, 1));
+    camp::Value arg = camp::lua::valueFromLua(L, 2);
+
+    try
+    {
+        // Retrieve the function to be called
+        const camp::Function& function = userdata->getClass().getOperator(Op, arg.typeInfo());
+
+        // Clear the stack
+        lua_settop(L, 0);
+
+        // Call the function.
+        camp::Value result = function.call(*userdata, camp::Args(arg));
+
+        // Push the result if needed
+        if (result.type() == camp::noType)
+        {
+            return 0;
+        }
+        else
+        {
+            camp::lua::valueToLua(L, result);
+            return 1;
+        }
+    }
+    catch (const camp::Error& err)
+    {
+        return luaL_error(L, err.what());
+    }
+
+    return 0;
+}
+
+/**
+ * \brief Callback called when umin is called in Lua.
+ *
+ * \param L Lua stack holding the userdata
+ * \return Number of return value pushed on the stack
+ */
+int uminCallback(lua_State* L);
 
 } // namespace lua
 

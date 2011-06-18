@@ -22,6 +22,8 @@
 
 
 #include <camp/typeinfo.hpp>
+#include <camp/enum.hpp>
+#include <camp/class.hpp>
 
 
 namespace camp
@@ -49,6 +51,12 @@ bool ArrayType::operator==(const ArrayType& other) const
 bool ArrayType::operator!=(const ArrayType& other) const
 {
     return !ArrayType::operator==(other);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool ArrayType::operator<(const ArrayType& other) const
+{
+    return m_elementType < other.m_elementType;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -81,6 +89,57 @@ bool DictionaryType::operator==(const DictionaryType& other) const
 bool DictionaryType::operator!=(const DictionaryType& other) const
 {
     return !DictionaryType::operator==(other);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool DictionaryType::operator<(const DictionaryType& other) const
+{
+    return m_keyType < other.m_keyType || !( other.m_keyType < m_keyType) 
+        && m_elementType < other.m_elementType;
+}
+
+//-------------------------------------------------------------------------------------------------
+std::string TypeToString::operator()( camp::Type type )
+{
+    switch(type)
+    {
+        case noType:            return "Void";
+        case boolType:          return "Boolean";
+        case intType:           return "Integer";
+        case realType:          return "Real";
+        case stringType:        return "String";
+        case enumType:          return "Enum";
+        case arrayType:         return "Array";
+        case dictionaryType:    return "Dictionary";
+        case valueType:         return "Value";
+        case userType:          return "User";
+    }
+    return "Unknown";
+}
+
+//-------------------------------------------------------------------------------------------------
+std::string TypeToString::operator()( const camp::Enum* metaenum )
+{
+    return metaenum->name();
+}
+
+//-------------------------------------------------------------------------------------------------
+std::string TypeToString::operator()( const camp::Class* metaclass )
+{
+    return metaclass->name();
+}
+
+//-------------------------------------------------------------------------------------------------
+std::string TypeToString::operator()( camp::ArrayType type )
+{
+    return "Array<" + type.elements().apply_visitor(TypeToString()) + ">";
+}
+
+//-------------------------------------------------------------------------------------------------
+std::string TypeToString::operator()( camp::DictionaryType type )
+{
+    return "Dictionary<" + type.keys().apply_visitor(TypeToString()) + ", "
+        + type.elements().apply_visitor(TypeToString()) + ">";
 }
 
 } // namespace camp

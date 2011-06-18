@@ -25,6 +25,7 @@
 #include <camp-lua/callback.hpp>
 #include <camp-lua/lua.hpp>
 #include <camp/class.hpp>
+#include <camp/operator.hpp>
 
 namespace camp
 {
@@ -92,67 +93,67 @@ void ValueToLuaVisitor::operator()(const camp::UserObject& value)
         lua_pushcfunction(m_L, &newIndexCallback);
         lua_rawset(m_L, -3);
 
-        if(metaclass.hasTag("EnableAddOperator"))
+        if(metaclass.hasOperator(camp::add))
         {
-            // Set the __add event to call the addCallback function
+            // Set the __add event to call the operatorCallback function
             lua_pushstring(m_L, "__add");
-            lua_pushcfunction(m_L, &addCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::add>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableSubtractOperator"))
+        if(metaclass.hasOperator(camp::sub))
         {
-            // Set the __sub event to call the subtractCallback function
+            // Set the __sub event to call the operatorCallback function
             lua_pushstring(m_L, "__sub");
-            lua_pushcfunction(m_L, &subtractCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::sub>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableMultiplyOperator"))
+        if(metaclass.hasOperator(camp::mul))
         {
-            // Set the __mul event to call the multiplyCallback function
+            // Set the __mul event to call the operatorCallback function
             lua_pushstring(m_L, "__mul");
-            lua_pushcfunction(m_L, &multiplyCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::mul>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableDivideOperator"))
+        if(metaclass.hasOperator(camp::div))
         {
-            // Set the __div event to call the divideCallback function
+            // Set the __div event to call the operatorCallback function
             lua_pushstring(m_L, "__div");
-            lua_pushcfunction(m_L, &divideCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::div>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableModulusOperator"))
+        if(metaclass.hasOperator(camp::mod))
         {
-            // Set the __mod event to call the modulusCallback function
+            // Set the __mod event to call the operatorCallback function
             lua_pushstring(m_L, "__mod");
-            lua_pushcfunction(m_L, &modulusCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::mod>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableEqualsOperator"))
+        if(metaclass.hasOperator(camp::eq))
         {
-            // Set the __eq event to call the equalsCallback function
+            // Set the __eq event to call the operatorCallback function
             lua_pushstring(m_L, "__eq");
-            lua_pushcfunction(m_L, &equalsCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::eq>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableLessOperator"))
+        if(metaclass.hasOperator(camp::lt))
         {
-            // Set the __lt event to call the lessCallback function
+            // Set the __lt event to call the operatorCallback function
             lua_pushstring(m_L, "__lt");
-            lua_pushcfunction(m_L, &lessCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::lt>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableLessEqualsOperator"))
+        if(metaclass.hasOperator(camp::lte))
         {
-            // Set the __le event to call the lessEqualsCallback function
+            // Set the __le event to call the operatorCallback function
             lua_pushstring(m_L, "__le");
-            lua_pushcfunction(m_L, &lessEqualsCallback);
+            lua_pushcfunction(m_L, &operatorCallback<camp::lte>);
             lua_rawset(m_L, -3);
         }
-        if(metaclass.hasTag("EnableUnaryMinusOperator"))
+        if(metaclass.hasOperator(camp::umin))
         {
-            // Set the __unm event to call the unaryMinusCallback function
+            // Set the __unm event to call the operatorCallback function
             lua_pushstring(m_L, "__unm");
-            lua_pushcfunction(m_L, &unaryMinusCallback);
+            lua_pushcfunction(m_L, &uminCallback);
             lua_rawset(m_L, -3);
         }
     }

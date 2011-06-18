@@ -27,6 +27,8 @@
 
 #include <camp/error.hpp>
 #include <camp/type.hpp>
+#include <camp/typeinfo.hpp>
+#include <camp/operator.hpp>
 
 
 namespace camp
@@ -46,7 +48,7 @@ public:
      * \param provided Provided type
      * \param expected Expected type
      */
-    BadType(Type provided, Type expected);
+    BadType(TypeInfo provided, TypeInfo expected);
 
 protected:
 
@@ -56,15 +58,6 @@ protected:
      * \param message Description of the error
      */
     BadType(const std::string& message);
-
-    /**
-     * \brief Get the string name of a CAMP type
-     *
-     * \param type Type to convert
-     *
-     * \return Name of the provided type
-     */
-    static std::string typeName(Type type);
 };
 
 /**
@@ -82,7 +75,7 @@ public:
      * \param index Index of the argument in the function prototype
      * \param functionName Name of the function
      */
-    BadArgument(Type provided, Type expected, std::size_t index, const std::string& functionName);
+    BadArgument(TypeInfo provided, TypeInfo expected, std::size_t index, const std::string& functionName);
 };
 
 /**
@@ -255,6 +248,32 @@ public:
      */
     FunctionNotFound(const std::string& name, const std::string& className);
 };
+
+/**
+ * \brief Error thrown when an operator can't be found in a metaclass
+ */
+class CAMP_API OperatorNotFound : public Error
+{
+public:
+
+    /**
+     * \brief Constructor
+     *
+     * \param operatorType Type of the operator
+     * \param argType Type info of the operator argument type
+     * \param className Name of the owner metaclass
+     */
+    OperatorNotFound(OperatorType operatorType, TypeInfo argType, const std::string& className);
+
+    /**
+     * \brief Constructor
+     *
+     * \param operatorType Type of the operator
+     * \param className Name of the owner metaclass
+     */
+    OperatorNotFound(OperatorType operatorType, const std::string& className);
+};
+
 
 /**
  * \brief Error thrown when a declaring a metaclass that already exists

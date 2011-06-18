@@ -27,6 +27,7 @@
 
 #include <camp/config.hpp>
 #include <camp/type.hpp>
+#include <camp/typeinfo.hpp>
 #include <camp/enumobject.hpp>
 #include <camp/userobject.hpp>
 #include <camp/valuemapper.hpp>
@@ -102,11 +103,34 @@ public:
     Value(const T& val);
 
     /**
-     * \brief Return the CAMP type of the value
+     * \brief Construct the value from a user object
+     *
+     * \param val Value to store
+     */
+    template <>
+    Value(const UserObject& val);
+
+    /**
+     * \brief Construct the value from an enum object
+     *
+     * \param val Value to store
+     */
+    template <>
+    Value(const EnumObject& val);
+
+    /**
+     * \brief Return the type of the value
      *
      * \return Type of the value
      */
     Type type() const;
+
+    /**
+     * \brief Return the type info of the value
+     *
+     * \return Type of the value
+     */
+    TypeInfo typeInfo() const;
 
     /**
      * \brief Convert the value to the type T
@@ -197,7 +221,8 @@ private:
     typedef boost::variant<NoType, bool, long, double, std::string, EnumObject, UserObject> Variant;
 
     Variant m_value; ///< Stored value
-    Type m_type; ///< CAMP type of the value
+    Type m_type; ///< Type of the value
+    TypeInfo m_typeInfo; ///< Yype info of the value
 };
 
 /**

@@ -437,6 +437,8 @@ struct ValueMapper<const char*>
         // a camp::Value to a const char*, which is not allowed
         return T::CONVERSION_TO_CONST_CHAR_PTR_IS_NOT_ALLOWED();
     }
+
+    static camp::TypeInfo typeInfo() { return camp::stringType; }
 };
 
 } // namespace camp_ext

@@ -162,6 +162,51 @@ ClassBuilder<T>& ClassBuilder<T>::function(const std::string& name, F1 function1
 
 //-------------------------------------------------------------------------------------------------
 template <typename T>
+template <typename F>
+ClassBuilder<T>& ClassBuilder<T>::addOperator(OperatorType operatorType, F function)
+{
+    // Get a uniform function type from F, whatever it really is
+    typedef typename boost::function_types::function_type<F>::type Signature;
+
+    // TODO: Check if F has the correct signature for given operator type
+    // TODO: Generate name
+
+    // Construct and add the metaoperator
+    return addOperator(new detail::FunctionImpl<Signature>("Operator", function, operatorType));
+}
+
+//-------------------------------------------------------------------------------------------------
+template <typename T>
+template <OperatorType Op, typename R, typename A>
+ClassBuilder<T>& ClassBuilder<T>::addOperator()
+{
+    // Generate signature using operator type traits
+    typedef detail::OperatorFunction4<Op, T, R, A> OpFunc;
+    typedef typename boost::function_types::function_type<typename OpFunc::Signature>::type Signature;
+
+    // TODO: Generate name
+
+    // Construct and add the metaoperator
+    return addOperator(new detail::FunctionImpl<Signature>("Operator", OpFunc::op(), Op));
+}
+
+//-------------------------------------------------------------------------------------------------
+template <typename T>
+template <OperatorType Op, typename ROrA>
+ClassBuilder<T>& ClassBuilder<T>::addOperator()
+{
+    // Generate signature using operator type traits
+    typedef detail::OperatorFunction3<Op, T, ROrA> OpFunc;
+    typedef typename boost::function_types::function_type<typename OpFunc::Signature>::type Signature;
+
+    // TODO: Generate name
+
+    // Construct and add the metaoperator
+    return addOperator(new detail::FunctionImpl<Signature>("Operator", OpFunc::op(), Op));
+}
+
+//-------------------------------------------------------------------------------------------------
+template <typename T>
 ClassBuilder<T>& ClassBuilder<T>::tag(const Value& id)
 {
     return tag(id, Value::nothing);
@@ -385,6 +430,27 @@ ClassBuilder<T>& ClassBuilder<T>::addFunction(Function* function)
     Class::FunctionPtr functionPtr(function);
     functions.insert(functionPtr);
     ownFunctions.insert(functionPtr);
+
+    m_currentTagHolder = m_currentFunction = function;
+    m_currentProperty = 0;
+
+    return *this;
+}
+
+//-------------------------------------------------------------------------------------------------
+template <typename T>
+ClassBuilder<T>& ClassBuilder<T>::addOperator(Function* function)
+{
+    // Retrieve the class' operator indexed by operator, return and argument type
+    Class::UniqueOperatorIndex& operators = m_target->m_operators.get<Class::OperatorUnique>();
+
+    // First remove any operator that already exists with the same signature
+    Class::UniqueOperatorIndex::const_iterator i = operators.find(
+        boost::make_tuple(function->operatorType(), function->argTypeInfoSafe<0>()));
+    if(i != operators.end()) operators.erase(i);
+
+    Class::FunctionPtr functionPtr(function);
+    operators.insert(functionPtr);
 
     m_currentTagHolder = m_currentFunction = function;
     m_currentProperty = 0;

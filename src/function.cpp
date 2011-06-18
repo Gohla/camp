@@ -40,6 +40,12 @@ const std::string& Function::name() const
 }
 
 //-------------------------------------------------------------------------------------------------
+OperatorType Function::operatorType() const
+{
+    return m_operatorType;
+}
+
+//-------------------------------------------------------------------------------------------------
 std::size_t Function::argCount() const
 {
     return m_argTypes.size();
@@ -78,6 +84,16 @@ TypeInfo Function::argTypeInfo(std::size_t index) const
 }
 
 //-------------------------------------------------------------------------------------------------
+TypeInfo Function::argTypeInfoSafe(std::size_t index) const
+{
+    // Make sure that the index is not out of range
+    if (index >= m_argTypeInfo.size())
+        return noType;
+
+    return m_argTypeInfo[index];
+}
+
+//-------------------------------------------------------------------------------------------------
 bool Function::callable(const UserObject& object) const
 {
     return m_callable.get(object);
@@ -105,9 +121,10 @@ void Function::accept(ClassVisitor& visitor) const
 }
 
 //-------------------------------------------------------------------------------------------------
-Function::Function(const std::string& name, Type returnType, TypeInfo returnTypeInfo, const std::vector<Type>& argTypes,
-    const std::vector<TypeInfo>& argTypeInfo)
+Function::Function(const std::string& name, OperatorType operatorType, Type returnType, 
+    TypeInfo returnTypeInfo, const std::vector<Type>& argTypes, const std::vector<TypeInfo>& argTypeInfo)
     : m_name(name)
+    , m_operatorType(operatorType)
     , m_returnType(returnType)
     , m_returnTypeInfo(returnTypeInfo)
     , m_argTypes(argTypes)

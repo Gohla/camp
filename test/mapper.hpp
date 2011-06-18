@@ -28,6 +28,7 @@
 #include <camp/simpleproperty.hpp>
 #include <camp/function.hpp>
 #include <camp/typeinfo.hpp>
+#include <camp/operator.hpp>
 #include <map>
 #include <string>
 
@@ -125,7 +126,7 @@ namespace MapperTest
         public:
 
             MyFunction(const std::string& name)
-                : camp::Function(name, camp::stringType, camp::stringType)
+                : camp::Function(name, camp::noop, camp::stringType, camp::stringType)
             {
             }
 

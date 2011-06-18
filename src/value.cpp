@@ -34,6 +34,7 @@ const Value Value::nothing;
 Value::Value()
     : m_value(NoType())
     , m_type(noType)
+    , m_typeInfo(noType)
 {
 }
 
@@ -41,6 +42,7 @@ Value::Value()
 Value::Value(const Value& other)
     : m_value(other.m_value)
     , m_type(other.m_type)
+    , m_typeInfo(other.m_typeInfo)
 {
 }
 
@@ -48,6 +50,12 @@ Value::Value(const Value& other)
 Type Value::type() const
 {
     return m_type;
+}
+
+//-------------------------------------------------------------------------------------------------
+TypeInfo Value::typeInfo() const
+{
+    return m_typeInfo;
 }
 
 //-------------------------------------------------------------------------------------------------

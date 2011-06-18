@@ -32,6 +32,7 @@
 #include <camp/type.hpp>
 #include <camp/typeinfo.hpp>
 #include <camp/value.hpp>
+#include <camp/operator.hpp>
 #include <string>
 #include <vector>
 
@@ -63,6 +64,13 @@ public:
      * \return Name of the function
      */
     const std::string& name() const;
+
+    /**
+     * \brief Get the operator type of the function
+     *
+     * \return operator type of the function
+     */
+    OperatorType operatorType() const;
 
     /**
      * \brief Get the number of arguments of the function
@@ -108,6 +116,35 @@ public:
     TypeInfo argTypeInfo(std::size_t index) const;
 
     /**
+     * \brief Get the type info of an argument given by its index using a templated integer
+     *
+     * \return Type info of the index-th argument
+     *
+     * \throw OutOfRange index is out of range
+     */
+    template <unsigned int I>
+    inline TypeInfo argTypeInfo() const {return argTypeInfo(I);}
+
+    /**
+     * \brief Get the type info of an argument given by its index, returns camp::noType when index is out of range
+     *
+     * \param index Index of the argument
+     *
+     * \return Type info of the index-th argument or camp::noType when index is out of range
+     */
+    TypeInfo argTypeInfoSafe(std::size_t index) const;
+
+    /**
+     * \brief Get the type info of an argument given by its index using a templated integer, returns camp::noType when index is out of range
+     *
+     * \param index Index of the argument
+     *
+     * \return Type info of the index-th argument or camp::noType when index is out of range
+     */
+    template <unsigned int I>
+    inline TypeInfo argTypeInfoSafe() const {return argTypeInfoSafe(I);}
+
+    /**
      * \brief Check if the function is currently callable for a given object
      *
      * \param object Object
@@ -148,6 +185,7 @@ protected:
      * \brief Construct the function from its description
      *
      * \param name Name of the function
+     * \param operatorType Operator type of the function
      * \param returnType Type of the function result
      * \param returnTypeInfo Type info of the function result
      * \param argTypes Types of the function arguments (empty array by default)
@@ -155,8 +193,8 @@ protected:
      *
      * \return Value returned by the function call
      */
-    Function(const std::string& name, Type returnType, TypeInfo returnTypeInfo, const std::vector<Type>& argTypes = std::vector<Type>(), 
-        const std::vector<TypeInfo>& argTypeInfo = std::vector<TypeInfo>());
+    Function(const std::string& name, OperatorType operatorType, Type returnType, TypeInfo returnTypeInfo, 
+        const std::vector<Type>& argTypes = std::vector<Type>(), const std::vector<TypeInfo>& argTypeInfo = std::vector<TypeInfo>());
 
     /**
      * \brief Do the actual call
@@ -180,6 +218,7 @@ private:
     TypeInfo m_returnTypeInfo; ///< Return type info
     std::vector<Type> m_argTypes; ///< Type of all the function arguments
     std::vector<TypeInfo> m_argTypeInfo; ///< Type info of all the function arguments
+    OperatorType m_operatorType; ///< Operator type
     detail::Getter<bool> m_callable; ///< Accessor to get the callable state of the function
 };
 

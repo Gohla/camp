@@ -90,6 +90,15 @@ public:
      */
      bool operator!=(const ArrayType& other) const;
 
+    /**
+     * \brief Operator < to check relation between two array types
+     *
+     * \param other array type to compare with this
+     *
+     * \return True if the element type is less than the other element type, false otherwise
+     */
+     bool operator<(const ArrayType& other) const;
+
 private:
 
     TypeInfo m_elementType;	///< Array element type info
@@ -149,6 +158,15 @@ public:
      */
      bool operator!=(const DictionaryType& other) const;
 
+    /**
+     * \brief Operator < to check relation between two dictionary types
+     *
+     * \param other dictionary type type to compare with this
+     *
+     * \return True if the element and key types are less than the other element and key types, false otherwise
+     */
+     bool operator<(const DictionaryType& other) const;
+
 private:
 
     TypeInfo m_keyType;	///< Dictionary key type info
@@ -202,16 +220,16 @@ private:
  *     }
  *     std::string operator()(const camp::Class* metaclass)
  *     {
- *         return "UserType(\"" + metaclas->name() + "\")";
+ *         return "UserType(\"" + metaclass->name() + "\")";
  *     }
  *     std::string operator()(camp::ArrayType type)
  *     {
- *         return "ArrayType(\"" + type.m_elementType.visit(TypeVisitor()) + "\")";
+ *         return "ArrayType(\"" + type.elements().apply_visitor(TypeVisitor()) + "\")";
  *     }
  *     std::string operator()(camp::DictionaryType type)
  *     {
- *         return "DictionaryType(\"" + type.m_keyType.visit(TypeVisitor()) + "\", \"" +
- *             + type.m_elementType.visit(TypeVisitor()) "\")";
+ *         return "DictionaryType(\"" + type.keys().apply_visitor(TypeVisitor()) + "\", \"" +
+ *             + type.elements().apply_visitor(TypeVisitor()) "\")";
  *     }
  * };
  * 
@@ -223,6 +241,18 @@ template <typename T = void>
 class TypeVisitor : public boost::static_visitor<T>
 {
 
+};
+
+/**
+ * /brief Type visitor that returns a string representation of a given type
+ */
+struct TypeToString : public camp::TypeVisitor<std::string>
+{
+    std::string operator()(camp::Type type);
+    std::string operator()(const camp::Enum* metaenum);
+    std::string operator()(const camp::Class* metaclass);
+    std::string operator()(camp::ArrayType type);
+    std::string operator()(camp::DictionaryType type);
 };
 
 } // namespace camp

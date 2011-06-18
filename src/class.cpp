@@ -171,6 +171,60 @@ void Class::destroy(const UserObject& object) const
 }
 
 //-------------------------------------------------------------------------------------------------
+std::size_t Class::operatorCount() const
+{
+    return m_operators.size();
+}
+
+//-------------------------------------------------------------------------------------------------
+bool Class::hasOperator(OperatorType operatorType) const
+{
+    const LookupOperatorIndex& operators = m_operators.get<OperatorLookup>();
+    return operators.count(operatorType) > 0;
+}
+
+//-------------------------------------------------------------------------------------------------
+bool Class::hasOperator(OperatorType operatorType, TypeInfo argType) const
+{
+    const UniqueOperatorIndex& operators = m_operators.get<OperatorUnique>();
+    return operators.find(boost::make_tuple(operatorType, argType)) != operators.end();
+}
+
+//-------------------------------------------------------------------------------------------------
+const Function& Class::getOperator(std::size_t index) const
+{
+    // Make sure that the index is not out of range
+    if (index >= m_operators.size())
+        CAMP_ERROR(OutOfRange(index, m_operators.size()));
+
+    return *m_operators[index];
+}
+
+//-------------------------------------------------------------------------------------------------
+const Function& Class::getOperator(OperatorType operatorType, TypeInfo argType) const
+{
+    const UniqueOperatorIndex& operators = m_operators.get<OperatorUnique>();
+
+    UniqueOperatorIndex::const_iterator it = operators.find(boost::make_tuple(operatorType, argType));
+    if (it == operators.end())
+        CAMP_ERROR(OperatorNotFound(operatorType, argType, m_name));
+
+    return **it;
+}
+
+//-------------------------------------------------------------------------------------------------
+const Function& Class::getUnaryOperator(OperatorType operatorType) const
+{
+    const LookupOperatorIndex& operators = m_operators.get<OperatorLookup>();
+
+    LookupOperatorIndex::const_iterator it = operators.find(operatorType);
+    if (it == operators.end())
+        CAMP_ERROR(OperatorNotFound(operatorType, m_name));
+
+    return **it;
+}
+
+//-------------------------------------------------------------------------------------------------
 void Class::visit(ClassVisitor& visitor) const
 {
     // First visit properties
@@ -206,7 +260,6 @@ void* Class::applyOffset(void* pointer, const Class& target) const
     // No match found, target is not a base class nor a derived class of this
     CAMP_ERROR(ClassUnrelated(name(), target.name()));
 }
-
 //-------------------------------------------------------------------------------------------------
 bool Class::operator==(const Class& other) const
 {
