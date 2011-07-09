@@ -68,6 +68,13 @@ public:
     Args();
 
     /**
+     * \brief Copy constructor
+     *
+     * \param other Arguments to copy
+     */
+    Args(const Args& other);
+
+    /**
      * \brief Construct the list with 1 argument
      *
      * \param a0 Argument to put in the list

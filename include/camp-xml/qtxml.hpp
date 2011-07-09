@@ -93,14 +93,14 @@ struct QtXml
  *
  * \param object Object to serialize
  * \param node Parent for the generated XML nodes
- * \param tag Tag to include or exclude from the serialization process.
- * \param include Set this to true to make the tag an including tag, false for excluding tag.
+ * \param tags Tags to include or exclude from the serialization process.
+ * \param include Set this to true to make the tags including tags, false for excluding tags.
  * \param throwExceptions Set this to false to ignore thrown exceptions.
  */
-inline void serialize(const UserObject& object, QDomElement node, const Value& tag = Value::nothing,
+inline void serialize(const UserObject& object, QDomElement node, const Args& tags = Args::empty,
     bool include = false, bool throwExceptions = true)
 {
-    detail::serialize<detail::QtXml>(object, node, tag, include, throwExceptions);
+    detail::serialize<detail::QtXml>(object, node, tags, include, throwExceptions);
 }
 
 /**

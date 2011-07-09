@@ -28,7 +28,7 @@ namespace detail
 {
 //-------------------------------------------------------------------------------------------------
 template <typename Proxy>
-void serialize(const UserObject& object, typename Proxy::NodeType node, const Value& tag, 
+void serialize(const UserObject& object, typename Proxy::NodeType node, const Args& tags, 
     bool include, bool throwExceptions)
 {
     // Iterate over the object's properties using its metaclass
@@ -39,9 +39,15 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
         {
             const Property& property = metaclass.property(i);
 
-            // If the property has the exclude tag, ignore it
-            if ((tag != Value::nothing) && include?!property.hasTag(tag):property.hasTag(tag))
-                continue;
+            // If the property has an exclude tag, ignore it
+            bool skip = false;
+            for(std::size_t i = 0; i < tags.count(); ++i)
+            {
+                const Value& tag = tags[i];
+                if(include && !property.hasTag(tag)) skip = true;
+                else if(property.hasTag(tag)) skip = true;
+            }
+            if(skip) continue;
 
             // Create a child node for the new property
             typename Proxy::NodeType child = Proxy::addChild(node, property.name());
@@ -50,10 +56,10 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
 
             if (property.type() == userType)
             {
-                if(!querySerialize(property.get(object), tag)) continue;
+                if(!querySerialize(property.get(object), tags, include)) continue;
 
                 // The current property is a composed type: serialize it recursively
-                serialize<Proxy>(property.get(object).to<UserObject>(), child, tag, include, 
+                serialize<Proxy>(property.get(object).to<UserObject>(), child, tags, include, 
                     throwExceptions);
             }
             else if (property.type() == arrayType)
@@ -65,14 +71,14 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
                 std::size_t count = arrayProperty.size(object);
                 for (std::size_t j = 0; j < count; ++j)
                 {
-                    if(!querySerialize(arrayProperty.get(object, j), tag)) continue;
+                    if(!querySerialize(arrayProperty.get(object, j), tags, include)) continue;
 
                     // Add a new XML node for each array element
                     typename Proxy::NodeType item = Proxy::addChild(child, "item");
                     if (Proxy::isValid(item))
                     {
                         serializeValue<Proxy>(arrayProperty.get(object, j), arrayProperty.elementType(), 
-                            item, tag, include, throwExceptions);
+                            item, tags, include, throwExceptions);
                     }
                 }
             }
@@ -85,7 +91,7 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
                 DictionaryIteratorPtr j = dictionaryProperty.iterator(object);
                 while(j->valid())
                 {
-                    if(!querySerialize(j->value(), tag)) 
+                    if(!querySerialize(j->value(), tags, include)) 
                     {
                         j->next();
                         continue;
@@ -100,7 +106,7 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
                         if (Proxy::isValid(key))
                         {
                             serializeValue<Proxy>(j->key(), dictionaryProperty.keyType(), key, 
-                                tag, include, throwExceptions);
+                                tags, include, throwExceptions);
                         }
 
                         // Serialize element value
@@ -108,7 +114,7 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
                         if (Proxy::isValid(value))
                         {
                             serializeValue<Proxy>(j->value(), dictionaryProperty.elementType(), value, 
-                                tag, include, throwExceptions);
+                                tags, include, throwExceptions);
                         }
                     }
 
@@ -130,7 +136,7 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Va
 
 template <typename Proxy>
 inline void serializeErasureValue(const Value& value, typename Proxy::NodeType node, 
-    const Value& tag, bool include, bool throwExceptions)
+    const Args& tags, bool include, bool throwExceptions)
 {
     switch(value.type())
     {
@@ -176,7 +182,7 @@ inline void serializeErasureValue(const Value& value, typename Proxy::NodeType n
             if (Proxy::isValid(type)) 
             {
                 typename Proxy::NodeType name = Proxy::addChild(type, object.getClass().name());
-                if (Proxy::isValid(name)) serialize<Proxy>(object, name, tag, include, 
+                if (Proxy::isValid(name)) serialize<Proxy>(object, name, tags, include, 
                     throwExceptions);
             }
             break;
@@ -184,15 +190,28 @@ inline void serializeErasureValue(const Value& value, typename Proxy::NodeType n
     }
 }
 
-inline bool querySerialize(const Value& value, const Value& tag)
+inline bool querySerialize(const Value& value, const Args& tags, bool include)
 {
     switch(value.type())
     {
         case userType:
             UserObject object = value.to<UserObject>();
             const Class& metaclass = object.getClass();
-            if(!metaclass.hasTag(tag)) return true;
-            return !metaclass.tag(tag, object).to<bool>();
+
+            for(std::size_t i = 0; i < tags.count(); ++i)
+            {
+                const Value& tag = tags[i];
+
+                try
+                {
+                    return !metaclass.tag(tag, object).to<bool>();
+                }
+                catch(const camp::Error& e)
+                {
+                    if(include && !metaclass.hasTag(tag)) return false;
+                    else if(metaclass.hasTag(tag)) return false;
+                }
+            }
     }
 
     return true;
@@ -200,18 +219,18 @@ inline bool querySerialize(const Value& value, const Value& tag)
 
 template <typename Proxy>
 inline void serializeValue(const Value& value, Type type, typename Proxy::NodeType node, 
-    const Value& tag, bool include, bool throwExceptions)
+    const Args& tags, bool include, bool throwExceptions)
 {
     switch(type)
     {
         // The dictionary keys are composed objects: serialize them recursively
         case userType:
             // If the property has the exclude tag, ignore it
-            serialize<Proxy>(value.to<UserObject>(), node, tag, include, throwExceptions);
+            serialize<Proxy>(value.to<UserObject>(), node, tags, include, throwExceptions);
             break;
         // The dictionary keys are type erased values: serialize them and add type info
         case valueType:
-            serializeErasureValue<Proxy>(value, node, tag, include, throwExceptions);
+            serializeErasureValue<Proxy>(value, node, tags, include, throwExceptions);
             break;
         // The dictionary keys are simple properties: write them as the text of their XML node
         default:
