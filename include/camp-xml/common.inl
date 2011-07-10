@@ -45,7 +45,7 @@ void serialize(const UserObject& object, typename Proxy::NodeType node, const Ar
             {
                 const Value& tag = tags[i];
                 if(include && !property.hasTag(tag)) skip = true;
-                else if(property.hasTag(tag)) skip = true;
+                else if(!include && property.hasTag(tag)) skip = true;
             }
             if(skip) continue;
 
@@ -208,8 +208,8 @@ inline bool querySerialize(const Value& value, const Args& tags, bool include)
                 }
                 catch(const camp::Error& e)
                 {
-                    if(include && !metaclass.hasTag(tag)) return false;
-                    else if(metaclass.hasTag(tag)) return false;
+                    // Class doesn't have that tag or value is not a boolean.
+                    return true;
                 }
             }
     }
